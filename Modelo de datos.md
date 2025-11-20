@@ -1,6 +1,6 @@
 # Payment API Endpoint
 
-Listado pensado para un hackatón de un día. El orden sigue el flujo natural del pago (de creación a auditoría), no la prioridad.
+Endpoints orientativos para el UI presentado y las interacciones web2 en general. El dimensionamiento del componente web3 queda para una etapa posterior
 
 | # | Endpoint | Resumen |
 | - | --- | --- |
@@ -13,15 +13,14 @@ Listado pensado para un hackatón de un día. El orden sigue el flujo natural de
 | 7 | `POST /payments/{payment_id}/cancel` | Cancela antes de la confirmación final; requiere `cancel_reason` y `canceled_by`. |
 | 8 | `GET /payments/{payment_id}/receipt` | Devuelve un resumen firmado con todos los timestamps relevantes y el hash final. |
 | 9 | `GET /payments/{payment_id}/events` | Línea de tiempo ordenada de eventos, base para auditoría y depuración. |
-|10 | `GET /events` (+ `?since=` opcional) | Feed global para reconciliar múltiples pagos; se consume con cursor incremental. |
+|10 | `GET /events{timestamp}` | Feed global para reconciliar múltiples pagos; desde una fecha|
 |11 | `GET /payments` | Listado rápido por `status`, fechas o metadata; útil en dashboards. |
 |12 | `POST /payments/{payment_id}/webhooks` | Registra notificaciones push por pago o por patrón de metadata para evitar polling. |
 |13 | `DELETE /payments/{payment_id}/webhooks/{hook_id}` | Limpia suscripciones cuando caducan o ya no se necesitan. |
 
 ## Registro de eventos
 
-Usa un solo contrato JSON para cada transición; así cada `step` tiene su propio timestamp y metadata.
-
+Evento estándar, así cada `step` tiene su propio timestamp y metadata.
 ```
 {
   "event_id": "evt_01H...",
@@ -36,9 +35,4 @@ Usa un solo contrato JSON para cada transición; así cada `step` tiene su propi
   },
   "prev_event_id": "evt_01G..."
 }
-```
-
-Notas rápidas:
-- Mantén el JSON consistente para que cada evento sea fácil de comparar.
-- Expón `GET /events` con filtros como `since`, `limit` o `step` para no saturar a los clientes.
-- Replica los eventos por webhook y así evitas que los integradores hagan polling continuo.
+``` 
